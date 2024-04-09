@@ -6,18 +6,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace GroundBattle.Classes
 {
-    class Ground
+    public class Ground
     {
-        public static Texture2D BackGround { get; set; }
-
-        private static int widthWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-        private static int heightWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-        private static int heightGround = 150;
-        private static int lenOneSprite = 1440;
+        public static Texture2D BackGround;
+        public static int PositionX { get; set; }
 
         private static int widthWorld;
-        public static int WidthWorld 
-        { 
+        public static int WidthWorld
+        {
             get { return widthWorld; }
             set
             {
@@ -28,26 +24,25 @@ namespace GroundBattle.Classes
             }
         }
 
-        public static int Top
-        {
-            get { return heightWindow - heightGround; }
-        }
+        private static int widthWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+        private static int heightWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        private static int heightGround = 150;
+        private static int lenOneSprite = 1440;
 
-        private static int positionX;
-        private static Rectangle rect = new Rectangle(positionX, heightGround, widthWindow, heightGround);
-        private static Vector2 vec = new Vector2(positionX, Top);
         private static Color color = Color.White;
+        private static Rectangle rect = new Rectangle(PositionX, heightGround, widthWindow, heightGround);
+        private static Vector2 vec = new Vector2(PositionX, Top);
+
+        public static int Top { get { return heightWindow - heightGround; } }
 
         static public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(BackGround, vec, rect, color);
         }
 
-        static public void Update(int delta)
+        static public void Update()
         {
-            if (positionX + delta >= 0 && positionX + delta <= widthWorld)
-                positionX += delta;
-            rect = new Rectangle(positionX % lenOneSprite, heightGround, widthWindow, heightGround);
+            rect = new Rectangle(PositionX % lenOneSprite, heightGround, widthWindow, heightGround);
         }
     }
 }

@@ -10,6 +10,16 @@ namespace GroundBattle
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public enum Direction
+        {
+            Right, 
+            Left, 
+            Up,
+            Down
+        }
+
+        private Player player1;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -30,11 +40,14 @@ namespace GroundBattle
         protected override void LoadContent()
         {
             _spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
+
             Ground.BackGround = Content.Load<Texture2D>("Ground");
+            Ground.PositionX = 0;
             Ground.WidthWorld = 3000;
 
+            player1 = new Player(Content.Load<Texture2D>("Player"), 1000, 10, 2000);
+
             Elips.BackGround = Content.Load<Texture2D>("Ellipse");
-            Player.BackGround = Content.Load<Texture2D>("Player");
         }
 
         protected override void Update(GameTime gameTime)
@@ -43,11 +56,19 @@ namespace GroundBattle
                 Exit();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                Ground.Update(10);
+            {
+                player1.Update(Direction.Right);
+                Ground.Update();  
+            }
+                
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                Ground.Update(-10);
+            {
+                player1.Update(Direction.Left);
+                Ground.Update();
+            }
 
-            Player.Update();
+
+            player1.Update(Direction.Down);
             base.Update(gameTime);
         }
 
@@ -58,7 +79,7 @@ namespace GroundBattle
             _spriteBatch.Begin();
 
             Ground.Draw(_spriteBatch);
-            Player.Draw(_spriteBatch);
+            player1.Draw(_spriteBatch);
 
             _spriteBatch.End();
 

@@ -4,26 +4,60 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
+using static GroundBattle.Game1;
 
 namespace GroundBattle.Classes
 {
-    class Player
+    public class Player
     {
-        public static Texture2D BackGround { get; set; }
+        public Vector2 NowPosition { get; set; }
+        public readonly int Speed;
 
-        static Vector2 nowPosition = new Vector2(500, Ground.Top - 300);
-        static Color color = Color.White;
+        private Texture2D backGround;
+        private Color color = Color.White;
+        private int literalBorder;
 
+        private int widthWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
 
-        static public void Draw(SpriteBatch spriteBatch)
+        public Player(Texture2D backGround, int startPosX, int speed, int freedomArea) 
         {
-            spriteBatch.Draw(BackGround, nowPosition, color);
+            this.backGround = backGround;
+            this.Speed = speed;
+            literalBorder = (widthWindow - freedomArea) / 2;
+            NowPosition = new Vector2(startPosX, Ground.Top - 500);
         }
 
-        static public void Update()
+        public void Draw(SpriteBatch spriteBatch)
         {
-            if (Ground.Top > nowPosition.Y + BackGround.Height)
-                nowPosition = new Vector2(nowPosition.X, nowPosition.Y + 10);
+            spriteBatch.Draw(backGround, NowPosition, color);
+        }
+
+        public void Update(Direction direction)
+        {
+            float posY = NowPosition.Y;
+            float posX = NowPosition.X;
+
+            if (direction == Direction.Down && Ground.Top > NowPosition.Y + backGround.Height)
+            {
+                posY += Speed;
+            }
+            else if (direction == Direction.Left && posX > 0)
+            {
+                if (Ground.PositionX != 0 && posX < literalBorder)
+                    Ground.PositionX -= Speed;
+                else
+                    posX -= Speed;
+            } 
+            else if (direction == Direction.Right && posX < widthWindow - backGround.Width)
+            {
+                if (Ground.PositionX != Ground.WidthWorld && posX >= widthWindow - literalBorder)
+                    Ground.PositionX += Speed;
+                else
+                    posX += Speed;
+            }
+
+            NowPosition = new Vector2(posX, posY);
         }
     }
 }
