@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GroundBattle.Classes;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -19,15 +20,17 @@ namespace GroundBattle
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            _graphics.PreferredBackBufferWidth = 1440;
+            _graphics.PreferredBackBufferHeight = 1024;
+            _graphics.ApplyChanges();
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            _spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
+            Ground.BackGround = Content.Load<Texture2D>("Ground");
+            Elips.BackGround = Content.Load<Texture2D>("Ellipse");
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,7 +38,10 @@ namespace GroundBattle
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                Ground.Update(10);
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                Ground.Update(-10);
 
             base.Update(gameTime);
         }
@@ -43,9 +49,10 @@ namespace GroundBattle
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
+            _spriteBatch.Begin();
+            Ground.Draw(_spriteBatch);
+            Elips.Draw(_spriteBatch);
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
