@@ -20,8 +20,9 @@ namespace GroundBattle
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _graphics.PreferredBackBufferWidth = 1440;
-            _graphics.PreferredBackBufferHeight = 1024;
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
             _graphics.ApplyChanges();
             base.Initialize();
         }
@@ -30,7 +31,10 @@ namespace GroundBattle
         {
             _spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
             Ground.BackGround = Content.Load<Texture2D>("Ground");
+            Ground.WidthWorld = 3000;
+
             Elips.BackGround = Content.Load<Texture2D>("Ellipse");
+            Player.BackGround = Content.Load<Texture2D>("Player");
         }
 
         protected override void Update(GameTime gameTime)
@@ -43,16 +47,21 @@ namespace GroundBattle
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
                 Ground.Update(-10);
 
+            Player.Update();
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
             _spriteBatch.Begin();
+
             Ground.Draw(_spriteBatch);
-            Elips.Draw(_spriteBatch);
+            Player.Draw(_spriteBatch);
+
             _spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }
