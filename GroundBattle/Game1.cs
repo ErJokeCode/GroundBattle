@@ -1,24 +1,25 @@
-﻿using GroundBattle.Classes;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct2D1;
+using GroundBattle.Classes;
+using System;
 
 namespace GroundBattle
 {
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch;
 
         public enum Direction
         {
+            Empty,
             Right, 
             Left, 
             Up,
             Down
         }
-
-        private Player player1;
 
         public Game1()
         {
@@ -30,8 +31,8 @@ namespace GroundBattle
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
 
             _graphics.ApplyChanges();
             base.Initialize();
@@ -41,34 +42,47 @@ namespace GroundBattle
         {
             _spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
 
+
+            World.LoadContent();
+            
+
+            var player1 = new Player(Content.Load<Texture2D>("Player"), 1000, 100, 2, 30);
+            var player2 = new Player(Content.Load<Texture2D>("Player"), 500, 100, 2, 30);
             Ground.BackGround = Content.Load<Texture2D>("Ground");
-            Ground.PositionX = 0;
-            Ground.WidthWorld = 3000;
 
-            player1 = new Player(Content.Load<Texture2D>("Player"), 1000, 10, 2000);
-
-            Elips.BackGround = Content.Load<Texture2D>("Ellipse");
+            var el = new Elips();
+            el.BackGround = Content.Load<Texture2D>("Ellipse");
+            World.Players.Add(player1);
+            World.Players.Add(player2);
+            World.elips.Add(el);
         }
 
         protected override void Update(GameTime gameTime)
         {
+            var directs = new System.Collections.Generic.List<Direction>();
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
             {
-                player1.Update(Direction.Right);
-                Ground.Update();  
-            }
-                
+                directs.Add(Direction.Right); 
+            }   
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
-                player1.Update(Direction.Left);
-                Ground.Update();
+                directs.Add(Direction.Left);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                directs.Add(Direction.Up);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                directs.Add(Direction.Down);
             }
 
-
-            player1.Update(Direction.Down);
+            
+            World.Update(directs);
             base.Update(gameTime);
         }
 
@@ -77,9 +91,8 @@ namespace GroundBattle
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-
-            Ground.Draw(_spriteBatch);
-            player1.Draw(_spriteBatch);
+            World.Draw(_spriteBatch);
+            
 
             _spriteBatch.End();
 

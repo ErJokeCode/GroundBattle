@@ -1,48 +1,45 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.MediaFoundation;
-using System;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
+using Microsoft.Xna.Framework.Input;
+using GroundBattle.Classes;
+using System.Collections.Generic;
+using SpriteBatch = SharpDX.Direct2D1.SpriteBatch;
+using SharpDX.Direct2D1;
 
 namespace GroundBattle.Classes
 {
     public class Ground
     {
-        public static Texture2D BackGround;
-        public static int PositionX { get; set; }
-
-        private static int widthWorld;
-        public static int WidthWorld
-        {
-            get { return widthWorld; }
-            set
-            {
-                if (value - widthWindow < 0)
-                    widthWorld = 0;
-                else
-                    widthWorld = value - widthWindow;
-            }
-        }
-
-        private static int widthWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-        private static int heightWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-        private static int heightGround = 150;
-        private static int lenOneSprite = 1440;
-
-        private static Color color = Color.White;
-        private static Rectangle rect = new Rectangle(PositionX, heightGround, widthWindow, heightGround);
-        private static Vector2 vec = new Vector2(PositionX, Top);
+        public static Texture2D BackGround { get; set; }
+        
+        public static Vector2 Gravity { get; set; }
 
         public static int Top { get { return heightWindow - heightGround; } }
 
-        static public void Draw(SpriteBatch spriteBatch)
+        private static int widthWindow = World.WindowWidth;
+        private static int heightWindow = World.WindowHeight;
+        private static int heightGround = World.WindowHeight / 8;
+        private static int lenOneSprite = 720;
+        
+        private static Rectangle rect ;
+        private static Vector2 vec;
+        private static Color color;
+
+        public static void Initialize()
+        {
+            rect = new Rectangle(0, 0, widthWindow, heightGround);
+            vec = new Vector2(0, heightWindow - heightGround);
+            color = Color.White;
+        }
+
+        public static void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(BackGround, vec, rect, color);
         }
 
-        static public void Update()
+        public static void Update()
         {
-            rect = new Rectangle(PositionX % lenOneSprite, heightGround, widthWindow, heightGround);
+            rect = new Rectangle(World.PositionX % lenOneSprite, 0, widthWindow, heightGround);
         }
     }
 }

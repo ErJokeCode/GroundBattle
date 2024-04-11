@@ -6,58 +6,126 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 using static GroundBattle.Game1;
+using System.Diagnostics.Contracts;
 
 namespace GroundBattle.Classes
 {
     public class Player
     {
-        public Vector2 NowPosition { get; set; }
-        public readonly int Speed;
+        private Vector2 position;
+        public Vector2 Position 
+        { 
+            get { return position; } 
+            set {  position = value; } 
+        }
 
-        private Texture2D backGround;
+        public Texture2D BackGround {  get; }
+
+        private Vector2 velosity;
+
+
         private Color color = Color.White;
-        private int literalBorder;
+        private int maxVelosity;
+        private int a;
+        private int jump;
 
-        private int widthWindow = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+        private int widthWindow = World.WindowWidth;
 
-        public Player(Texture2D backGround, int startPosX, int speed, int freedomArea) 
+        public Player(Texture2D backGround, int startPosX, int maxVelosity, int a, int jump) 
         {
-            this.backGround = backGround;
-            this.Speed = speed;
-            literalBorder = (widthWindow - freedomArea) / 2;
-            NowPosition = new Vector2(startPosX, Ground.Top - 500);
+            BackGround = backGround;
+            this.maxVelosity = maxVelosity;
+            this.a = a;
+            this.jump = jump;
+            Position = new Vector2(startPosX + World.PositionX, Ground.Top - 500);
+        }
+
+        public void Move(List<Direction> directions)
+        {
+            UpdatePosition(GetSpeed(directions));
+        }
+
+        private Vector2 GetSpeed(List<Direction> dirs)
+        {
+            var velocCorect = new Vector2(0, 0);
+            foreach(var dir in dirs)
+            {
+                if (dir == Direction.Left)
+                    velocCorect.X -= a;
+                if (dir == Direction.Right)
+                    velocCorect.X += a;
+                if (dir == Direction.Up)
+                    velocCorect.Y -= jump;
+                if (dir == Direction.Down)
+                    velocCorect.Y += a;
+            }
+            return velocCorect;
+        }
+
+        private Vector2 GetTrueSpeed(Vector2 vect)
+        {
+            if (vect.Y > maxVelosity || vect.Y < -maxVelosity)
+                vect.Y = maxVelosity;
+            if (vect.X > maxVelosity || vect.X < -maxVelosity)
+                vect.X = maxVelosity;
+            return vect;
+        }
+
+        private void UpdatePosition(Vector2 cortrect) 
+        {
+            if (IsTouchingGround())
+            {
+                if (velosity.Y > 0)
+                    cortrect.Y = -velosity.Y;
+                velosity = velosity * new Vector2(0.9f, 1);
+            }
+            else
+                cortrect = new Vector2(0, Ground.Gravity.Y);
+
+            velosity += cortrect;
+            velosity = GetTrueSpeed(velosity);
+
+            if (velosity.X < 0 && position.X > 0)
+                ScrollWorld(IsTouchingLeftBorder());
+            else if (velosity.X > 0 && position.X < widthWindow - BackGround.Width)
+                ScrollWorld(IsTouchingRightBorder());
+            else if (position.X + velosity.X <= 0 || position.X + velosity.X >= widthWindow - BackGround.Width)
+                velosity.X = 0;
+
+
+            
+            position += velosity;
+        }
+
+        private bool IsTouchingGround() => position.Y + BackGround.Height + velosity.Y > Ground.Top;
+
+        private bool IsTouchingLeftBorder() => World.PositionX > 0 && position.X < World.LiteralBorder;
+
+        private bool IsTouchingRightBorder()
+        {
+            var rightBorder = widthWindow - World.LiteralBorder - BackGround.Width;
+            return World.PositionX < World.Width && position.X + velosity.Y >= rightBorder;
+        }
+
+        private void ScrollWorld(bool touchBorder)
+        {
+            if (touchBorder)
+            {
+                World.Scroll((int)velosity.X);
+                velosity.X = 0;
+            }
+            else
+                World.NoScroll();
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(backGround, NowPosition, color);
+            spriteBatch.Draw(BackGround, Position, color);
         }
 
-        public void Update(Direction direction)
+        public void Update(List<Direction> dirs)
         {
-            float posY = NowPosition.Y;
-            float posX = NowPosition.X;
-
-            if (direction == Direction.Down && Ground.Top > NowPosition.Y + backGround.Height)
-            {
-                posY += Speed;
-            }
-            else if (direction == Direction.Left && posX > 0)
-            {
-                if (Ground.PositionX != 0 && posX < literalBorder)
-                    Ground.PositionX -= Speed;
-                else
-                    posX -= Speed;
-            } 
-            else if (direction == Direction.Right && posX < widthWindow - backGround.Width)
-            {
-                if (Ground.PositionX != Ground.WidthWorld && posX >= widthWindow - literalBorder)
-                    Ground.PositionX += Speed;
-                else
-                    posX += Speed;
-            }
-
-            NowPosition = new Vector2(posX, posY);
+            Move(dirs);
         }
     }
 }
