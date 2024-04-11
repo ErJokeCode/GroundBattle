@@ -61,20 +61,22 @@ namespace GroundBattle.Classes
         {
             Ground.Draw(spriteBatch);
 
-            foreach(var player in Players)
+            elips[0].Draw(spriteBatch);
+
+            foreach (var player in Players)
                 player.Draw(spriteBatch);
 
-            elips[0].Draw(spriteBatch);
+            
         }
 
         public static void Update(List<Direction> directs)
         {
-            foreach (var player in Players)
-                player.Update(directs);
+            Ground.Update();
 
             elips[0].Update(-PositionX);
 
-            Ground.Update();
+            foreach (var player in Players)
+                player.Update(directs);
         }
     }
 }

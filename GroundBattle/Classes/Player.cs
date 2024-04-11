@@ -40,11 +40,6 @@ namespace GroundBattle.Classes
             Position = new Vector2(startPosX + World.PositionX, Ground.Top - 500);
         }
 
-        public void Move(List<Direction> directions)
-        {
-            UpdatePosition(GetSpeed(directions));
-        }
-
         private Vector2 GetSpeed(List<Direction> dirs)
         {
             var velocCorect = new Vector2(0, 0);
@@ -64,10 +59,10 @@ namespace GroundBattle.Classes
 
         private Vector2 GetTrueSpeed(Vector2 vect)
         {
-            if (vect.Y > maxVelosity || vect.Y < -maxVelosity)
-                vect.Y = maxVelosity;
-            if (vect.X > maxVelosity || vect.X < -maxVelosity)
-                vect.X = maxVelosity;
+            vect.Y = vect.Y < -jump ? -jump : vect.Y;
+            vect.X = vect.X > maxVelosity ? maxVelosity : vect.X;
+            vect.X = vect.X < -maxVelosity ? -maxVelosity : vect.X;
+
             return vect;
         }
 
@@ -93,8 +88,8 @@ namespace GroundBattle.Classes
                 velosity.X = 0;
 
 
-            
             position += velosity;
+            
         }
 
         private bool IsTouchingGround() => position.Y + BackGround.Height + velosity.Y > Ground.Top;
@@ -112,7 +107,7 @@ namespace GroundBattle.Classes
             if (touchBorder)
             {
                 World.Scroll((int)velosity.X);
-                velosity.X = 0;
+                position.X -= velosity.X;
             }
             else
                 World.NoScroll();
@@ -125,7 +120,7 @@ namespace GroundBattle.Classes
 
         public void Update(List<Direction> dirs)
         {
-            Move(dirs);
+            UpdatePosition(GetSpeed(dirs));
         }
     }
 }

@@ -46,8 +46,8 @@ namespace GroundBattle
             World.LoadContent();
             
 
-            var player1 = new Player(Content.Load<Texture2D>("Player"), 1000, 100, 2, 30);
-            var player2 = new Player(Content.Load<Texture2D>("Player"), 500, 100, 2, 30);
+            var player1 = new Player(Content.Load<Texture2D>("Player"), 1000, 10, 2, 30);
+            var player2 = new Player(Content.Load<Texture2D>("Player"), 500, 30, 2, 30);
             Ground.BackGround = Content.Load<Texture2D>("Ground");
 
             var el = new Elips();
@@ -75,10 +75,6 @@ namespace GroundBattle
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
             {
                 directs.Add(Direction.Up);
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                directs.Add(Direction.Down);
             }
 
             
